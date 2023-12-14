@@ -19,8 +19,6 @@ def index():
 data = pd.DataFrame(dictionnaire)
 
 
-#chk_id=0 # how to get the selected client ID frpù selectbox in streamlit ?
-
 
 
 X=data.drop(['SK_ID_CURR','TARGET'],axis=1)
