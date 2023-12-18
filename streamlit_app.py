@@ -107,7 +107,10 @@ def main() :
    
     # treat dataframe error
     # move rows request and json here out of the function load_data above
-    data = requests.get('https://flaskapiocr-ec7ba47103cd.herokuapp.com/').text
+    #data = requests.get('https://flaskapiocr-ec7ba47103cd.herokuapp.com/').text
+    data = requests.get('https://appprediction-8496ae9b0a5b.herokuapp.com/').text
+    
+
     data = pd.DataFrame(json.loads(data))
     
     
@@ -137,9 +140,9 @@ def main() :
     #predictionEgual = requests.get(f'http://127.0.0.1:5000/predict?ClientID={int(option)}').text
     #st.write('prediction:',predictionEgual)
 
-    #st.write('client num:', option)
+    #st.write('client num:', option+1)
 
-    
+    #st.write('client num:', type(option+1))
 
 
     #Loading general info
@@ -225,18 +228,34 @@ def main() :
     #Customer solvability display
     st.header("**Customer file analysis**")
     #prediction = load_prediction(sample, chk_id, clf)
-    predictionEgual = requests.get(f'http://127.0.0.1:5000/predict?ClientID={int(option)}')
+
+
+    from requests.adapters import HTTPAdapter
+    from requests.packages.urllib3.util.retry import Retry
+
+    retry_strategy = Retry(total=3, backoff_factor=1)
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    http = requests.Session()
+    http.mount("https://", adapter)
+    http.mount("http://", adapter)
+
+
+    predictionEgual = json.loads(http.get(f'http://127.0.0.1:5000/prediction?ClientID={option}').text)['prediction']
+    st.write('prediction:', predictionEgual)
+    #predictionEgual = requests.get(f'http://127.0.0.1:5000/predict?ClientID={int(option)}')
+    #predictionEgual = requests.get(f'https://appprediction-8496ae9b0a5b.herokuapp.com:5000/predict?ClientID={int(option)}')
+    
     #predictionEgual = requests.get(f'http://host.docker.internal:5000/predict?ClientID={int(option)}')
+    #https://appprediction-8496ae9b0a5b.herokuapp.com/
 
-
-    predictionEgual_dict = predictionEgual.json()
+    #predictionEgual_dict = predictionEgual.json()
     #st.write(predictionEgual_dict.get('prediction'))
     
 
     #prediction = 0.5
-    st.write("**Default probability : **{:.0f} %".format(round(float(predictionEgual_dict.get('prediction')), 2)))
+    st.write("**Default probability : **{:.0f} %".format(round(float(predictionEgual)), 2))
     #Compute decision according to the best threshold
-    if predictionEgual_dict.get('prediction') <= 50 :
+    if predictionEgual <= 50 :
         decision = "<font color='green'>**LOAN GRANTED**</font>" 
     else:
         decision = "<font color='red'>**LOAN REJECTED**</font>"

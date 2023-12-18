@@ -11,7 +11,7 @@ dictionnaire = {}
 for colonne in df.columns:
     dictionnaire[colonne] = df[colonne].tolist()
  
-@app.route('/')
+@app.route('/data')
 def index():
     return jsonify(dictionnaire)
  
@@ -20,13 +20,12 @@ data = pd.DataFrame(dictionnaire)
 
 
 
-
 X=data.drop(['SK_ID_CURR','TARGET'],axis=1)
 
 
 
-@app.route('/predict', methods=['GET','POST'])
-def predict():
+@app.route('/prediction', methods=['GET','POST'])
+def prediction():
     ClientID = request.args.get('ClientID')
     #ClientID = request.form.to_dict('ClientID')
     score = model.predict_proba(X[X.index == int(ClientID)])[:,1].tolist()
@@ -38,6 +37,10 @@ def predict():
     return jsonify(dct)
 
 
+
+@app.route('/', methods=['GET','POST'])
+def menu():
+    return render_template('menu.html')
 
 if __name__ == "__main__":
 
