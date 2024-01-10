@@ -18,11 +18,8 @@ for colonne in df.columns:
 def index():
     return jsonify(dictionnaire)
  
-
+# change dictionary to pandas
 data = pd.DataFrame(dictionnaire)
-
-
-
 X=data.drop(['SK_ID_CURR','TARGET'],axis=1)
 
 
